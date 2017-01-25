@@ -4,7 +4,7 @@ namespace JMose\CommandSchedulerBundle\Command;
 
 use Cron\CronExpression;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
@@ -183,11 +183,12 @@ class ExecuteCommand extends ContainerAwareCommand
             return;
         }
 
-        $input = new ArrayInput(array_merge(
+        $input = new ArgvInput(array_merge(
             array(
                 'command' => $scheduledCommand->getCommand(),
                 '--env'   => $input->getOption('env')
             ),
+            $scheduledCommand->getOptions(true),
             $scheduledCommand->getArguments(true)
         ));
 

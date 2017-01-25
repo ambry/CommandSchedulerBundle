@@ -32,6 +32,11 @@ class ScheduledCommand
     private $arguments;
 
     /**
+     * @var string
+     */
+    private $options;
+
+    /**
      * @see http://www.abunchofutils.com/utils/developer/cron-expression-helper/
      * @var string
      */
@@ -155,32 +160,16 @@ class ScheduledCommand
     }
 
     /**
-     * Get arguments - If toArray is passed to true, then the argument string is transformed into an exploitable array
-     *  to init and InputArgumentArray and run command
+     * Get arguments
      *
-     * @param bool $toArray
-     * @return array|mixed
+     * @return string
      */
-    public function getArguments($toArray = false)
+    public function getArguments($isArray=false)
     {
-        if (false === $toArray) {
+        if ($isArray === false) {
             return $this->arguments;
         }
-
-        $argsArray = array();
-        if (null !== $this->arguments || '' != $this->arguments) {
-            $flatArgsArray = explode(' ', preg_replace('/\s+/', ' ', $this->arguments));
-            foreach ($flatArgsArray as $argument) {
-                $tmpArray = explode('=', $argument);
-                if (count($tmpArray) == 1) {
-                    $argsArray[$tmpArray[0]] = true;
-                } else {
-                    $argsArray[$tmpArray[0]] = $tmpArray[1];
-                }
-            }
-        }
-
-        return $argsArray;
+        return explode(' ', preg_replace('/\s+/', ' ', $this->arguments));
     }
 
     /**
@@ -192,6 +181,56 @@ class ScheduledCommand
     public function setArguments($arguments)
     {
         $this->arguments = $arguments;
+
+        return $this;
+    }
+
+    /**
+     * Get options - get the options provided as an array, which may contain sub-arrays
+     * for options passed as multiple values
+     *
+     * @param bool $toArray
+     * @return array
+     */
+    public function getOptions($isArray=false)
+    {
+        if ($isArray ===  false) {
+            return $this->options;
+        }
+
+        $optsArray = array();
+        if (null !== $this->options || '' != $this->options) {
+            $flatOptsArray = explode(' ', preg_replace('/\s+/', ' ', $this->options));
+            foreach ($flatOptsArray as $option) {
+                // only use one equals to delimit the name from value
+                $tmpArray = explode('=', $option, 1);
+                if (isset($optsArray[$tmpArray[0]]) && count($tmpArray) > 1) {
+                    if (is_array($optsArray[$tmpArray[0]])) {
+                        $optsArray[$tmpArray[0]] []= $tmpArray[1];
+                    } else {
+                        $optsArray[$tmpArray[0]] = array($optsArray[$tmpArray[0]], $tmpArray[1]);
+                    }
+                } elseif(count($tmpArray) > 1) {
+                    $optsArray[$tmpArray[0]] = $tmpArray[1];
+                } else {
+                    $optsArray[$tmpArray[0]] = true;
+                }
+
+            }
+
+        }
+        return $optsArray;
+    }
+
+    /**
+     * Set options
+     *
+     * @param string $options
+     * @return ScheduledCommand
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
 
         return $this;
     }

@@ -107,6 +107,10 @@
                 <source>detail.actions</source>
                 <target>Actions</target>
             </trans-unit>
+            <trans-unit id="214">
+                <source>detail.options</source>
+                <target>Options</target>
+            </trans-unit>
 
             <!-- Flashs messages -->
             <trans-unit id="300">

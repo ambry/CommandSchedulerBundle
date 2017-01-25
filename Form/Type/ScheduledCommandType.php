@@ -49,6 +49,13 @@ class ScheduledCommandType extends AbstractType
         );
 
         $builder->add(
+            'options', TextType::class, array(
+                'label' => 'detail.options',
+                'required' => false
+            )
+        );
+
+        $builder->add(
             'cronExpression', TextType::class, array(
                 'label' => 'detail.cronExpression',
                 'required' => true
